@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Setup Python Project
-        uses: joshorr/reusable-github-workflows/py-setup-project@main
+        uses: joshorr/workflows/py-setup-project@main
       - name: Ensure on latest branch
         run: |
           git config pull.rebase true

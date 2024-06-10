@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Setup and Test Project
-        uses: joshorr/reusable-github-workflows/py-run-tests@main
+        uses: joshorr/workflows/py-run-tests@main
       #----------------------------------------------
       #              build release
       #----------------------------------------------

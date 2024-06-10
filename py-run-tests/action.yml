@@ -4,7 +4,7 @@ runs:
   using: "composite"
   steps:
     - name: Setup Python Project
-      uses: joshorr/reusable-github-workflows/py-setup-project@main
+      uses: joshorr/workflows/py-setup-project@main
     - name: Run tests
       shell: bash
       run: poetry run pytest

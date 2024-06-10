@@ -14,7 +14,7 @@ jobs:
       created-release: ${{ steps.release.outputs.release_created }}
     steps:
       - name: Setup and Test Project
-        uses: joshorr/reusable-github-workflows/py-run-tests@main
+        uses: joshorr/workflows/py-run-tests@main
       - name: Retrieve Project Package
         run: |
           PY_OUTPUT=$(poetry run python -c "import tomlkit; import pathlib; print(tomlkit.parse(pathlib.Path('pyproject.toml').read_text())['tool']['poetry']['name'], end='')")
@@ -38,13 +38,13 @@ jobs:
   publish-docs:
     needs: create-release
     if: ${{ needs.create-release.outputs.created-release }}
-    uses: joshorr/reusable-github-workflows/.github/workflows/py-publish-docs.yml@main
+    uses: joshorr/workflows/.github/workflows/py-publish-docs.yml@main
     secrets: inherit
 
   publish-release:
     needs: [create-release, publish-docs]
     if: ${{ needs.create-release.outputs.created-release }}
-    uses: joshorr/reusable-github-workflows/.github/workflows/py-publish-pypi.yml@main
+    uses: joshorr/workflows/.github/workflows/py-publish-pypi.yml@main
     with:
       real-publish: ${{ inputs.real-publish }}
     secrets: inherit
