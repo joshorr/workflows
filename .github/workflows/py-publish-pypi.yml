@@ -1,0 +1,38 @@
+on:
+  workflow_call:
+    inputs:
+      real-publish:
+        required: false
+        type: boolean
+        default: false
+        description: If true, will publish to prod pypi, otherwise it will publish to test. Defaults to false.
+name: force-publish
+jobs:
+  force-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup and Test Project
+        uses: joshorr/reusable-github-workflows/py-run-tests@main
+      #----------------------------------------------
+      #              build release
+      #----------------------------------------------
+      - name: Build
+        run: poetry build
+      #----------------------------------------------
+      #              publish release to pypi test
+      #----------------------------------------------
+      - name: Publish to test pypi
+        if: ${{ !inputs.real-publish }}
+        run: |
+          poetry config repositories.test-pypi https://test.pypi.org/legacy/
+          poetry config pypi-token.test-pypi ${{secrets.PYPI_TEST_TOKEN}}
+          poetry publish -r test-pypi
+      #----------------------------------------------
+      #              publish release tp pypi prod
+      #----------------------------------------------
+      - name: Publish to prod pypi
+        if: ${{ inputs.real-publish }}
+        run: |
+          poetry config pypi-token.pypi ${{secrets.PYPI_PROD_TOKEN}}
+          poetry publish
+

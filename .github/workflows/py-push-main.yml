@@ -1,0 +1,50 @@
+on:
+  workflow_call:
+    inputs:
+      real-publish:
+        required: false
+        type: boolean
+        default: false
+        description: If true, will publish to prod pypi, otherwise it will publish to test. Defaults to false.
+name: release-please
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    outputs:
+      created-release: ${{ steps.release.outputs.release_created }}
+    steps:
+      - name: Setup and Test Project
+        uses: joshorr/reusable-github-workflows/py-run-tests@main
+      - name: Retrieve Project Package
+        run: |
+          PY_OUTPUT=$(poetry run python -c "import tomlkit; import pathlib; print(tomlkit.parse(pathlib.Path('pyproject.toml').read_text())['tool']['poetry']['name'], end='')")
+          echo "PY_PKG=$PY_OUTPUT" >> $GITHUB_ENV
+      #----------------------------------------------
+      # release-please, increments version and tags releases.
+      #----------------------------------------------
+      - uses: google-github-actions/release-please-action@v3
+        id: release
+        with:
+          release-type: python
+          package-name: ${{ env.PY_PKG }}
+
+  create-release-output:
+    needs: create-release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dump out needs.create-release.created-release
+        run: echo '${{ toJSON(needs.create-release.outputs.created-release) }}'
+
+  publish-docs:
+    needs: create-release
+    if: ${{ needs.create-release.outputs.created-release }}
+    uses: joshorr/reusable-github-workflows/.github/workflows/py-publish-docs.yml@main
+    secrets: inherit
+
+  publish-release:
+    needs: [create-release, publish-docs]
+    if: ${{ needs.create-release.outputs.created-release }}
+    uses: joshorr/reusable-github-workflows/.github/workflows/py-publish-pypi.yml@main
+    with:
+      real-publish: ${{ inputs.real-publish }}
+    secrets: inherit

@@ -1,0 +1,9 @@
+on:
+  workflow_call:
+name: test
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup and Test Project
+        uses: joshorr/reusable-github-workflows/py-run-tests@main
