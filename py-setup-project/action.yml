@@ -7,11 +7,38 @@ runs:
     #       Check-out repo, set-up python + poetry
     #----------------------------------------------
     - name: Checkout Repo
-      uses: actions/checkout@v3
+      uses: actions/checkout@v6
+
+    - name: Detect Package Manager
+      shell: bash
+      run: |
+        if [ -f "uv.lock" ]; then
+          echo "Detected package manager: uv"
+          echo "PKG_MANAGER=uv" >> "$GITHUB_ENV"
+        else
+          echo "Detected package manager: poetry"
+          echo "PKG_MANAGER=poetry" >> "$GITHUB_ENV"
+        fi
+    #----------------------------------------------
+    #         Poetry Based Project
+    #----------------------------------------------
+    - name: Install uv
+      if: env.PKG_MANAGER == 'uv'
+      uses: astral-sh/setup-uv@v7
+    - name: Install UV Dependencies
+      if: env.PKG_MANAGER == 'uv'
+      shell: bash
+      run: uv sync
+
+    #----------------------------------------------
+    #         Poetry Based Project
+    #----------------------------------------------
     - name: Install poetry
+      if: env.PKG_MANAGER == 'poetry'
       shell: bash
       run: pipx install poetry
     - name: Read Needed Python Version
+      if: env.PKG_MANAGER == 'poetry'
       shell: bash
       run: |
         PY_VER=$(sed -n 's/^ *python *= *"[~^]*\([0-9\.]*\)"/\1/p' pyproject.toml)
@@ -22,12 +49,12 @@ runs:
       with:
         python-version: ${{ env.PY_VERSION }}
         cache: poetry
-    #----------------------------------------------
-    #         Install dependencies + self
-    #----------------------------------------------
+
     - name: Install Dependencies
+      if: env.PKG_MANAGER == 'poetry'
       shell: bash
       run: poetry install --no-interaction --no-root
     - name: Install Self
+      if: env.PKG_MANAGER == 'poetry'
       shell: bash
       run: poetry install --no-interaction

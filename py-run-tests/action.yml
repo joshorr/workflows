@@ -5,6 +5,13 @@ runs:
   steps:
     - name: Setup Python Project
       uses: joshorr/workflows/py-setup-project@main
+
     - name: Run tests
+      if: env.PKG_MANAGER == 'uv'
+      shell: bash
+      run: uv run pytest
+
+    - name: Run tests
+      if: env.PKG_MANAGER == 'poetry'
       shell: bash
       run: poetry run pytest

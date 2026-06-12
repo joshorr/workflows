@@ -23,18 +23,22 @@ jobs:
           git pull origin main
           git fetch --all
       - name: Retrieve Project Version
+        if: env.PKG_MANAGER == 'poetry'
         run: |
           PY_OUTPUT=$(poetry run python -c "import tomlkit; import pathlib; print(tomlkit.parse(pathlib.Path('pyproject.toml').read_text())['tool']['poetry']['version'], end='')")
           echo "VERSION=$PY_OUTPUT" >> $GITHUB_ENV
       - name: Retrieve Project Package
+        if: env.PKG_MANAGER == 'poetry'
         run: |
           PY_OUTPUT=$(poetry run python -c "import tomlkit; import pathlib; print(tomlkit.parse(pathlib.Path('pyproject.toml').read_text())['tool']['poetry']['name'], end='')")
           echo "PY_PKG=$PY_OUTPUT" >> $GITHUB_ENV
       - name: Retrieve Project Module
+        if: env.PKG_MANAGER == 'poetry'
         run: |
           PY_OUTPUT=$(poetry run python -c "import tomlkit; import pathlib; print(tomlkit.parse(pathlib.Path('pyproject.toml').read_text())['tool']['poetry']['packages'][0]['include'], end='')")
           echo "PY_MODULE=$PY_OUTPUT" >> $GITHUB_ENV
       - name: Retrieve Project Module
+        if: env.PKG_MANAGER == 'poetry'
         run: |
           PY_OUTPUT=$(poetry run python -c "import tomlkit; import pathlib; print(' '.join(tomlkit.parse(pathlib.Path('pyproject.toml').read_text()).get('tool', {}).get('custom', {}).get('xpublish', {}).get('extra-module-docs', [])), end='')")
           echo "PY_EXTRA_MODULES=$PY_OUTPUT" >> $GITHUB_ENV
@@ -45,10 +49,10 @@ jobs:
       - name: Remove Any Previous Site/Api Docs
         run: rm -rf site api
       - name: Building Website Docs
-        run: poetry run mike deploy --push --update-aliases ${{ env.VERSION }} latest
+        run: ${{ case(env.PKG_MANAGER == 'uv', 'uv', 'poetry') }} run mike deploy --push --update-aliases ${{ env.VERSION }} latest
 
       - name: Building Api Ref Docs
-        run: poetry run pdoc --html --output-dir ./api/ --force --config='show_inherited_members=True' ./${{ env.PY_MODULE }} ${{ env.PY_EXTRA_MODULES }}
+        run: ${{ case(env.PKG_MANAGER == 'uv', 'uv', 'poetry') }} run pdoc --html --output-dir ./api/ --force --config='show_inherited_members=True' ./${{ env.PY_MODULE }} ${{ env.PY_EXTRA_MODULES }}
 #      - name: Move Api Ref Docs to Root
 #        # I think pdoc puts it under PY_MODULE, but it may be under PY_PACKAGE instead; just keep an eye out in the future...
 #        run: |
