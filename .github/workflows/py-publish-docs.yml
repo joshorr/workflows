@@ -61,7 +61,7 @@ jobs:
         run: |
           PY_OUTPUT=$(uv run python -c "import tomlkit; import pathlib; print(tomlkit.parse(pathlib.Path('pyproject.toml').read_text())['project']['name'], end='')")
           echo "PY_PKG=$PY_OUTPUT" >> $GITHUB_ENV
-          echo "PY_MODULE=$PY_OUTPUT" >> ${MY_ORIGINAL_VAR//-/_}
+          echo "PY_MODULE=${PY_OUTPUT//-/_}" >> $GITHUB_ENV
       - name: Retrieve Project Module
         if: env.PKG_MANAGER == 'uv'
         run: |
