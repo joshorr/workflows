@@ -7,21 +7,10 @@ on:
         default: false
         description: If true, will publish to prod pypi, otherwise it will publish to test. Defaults to false.
       skip-release-please:
-      required: false
-      type: boolean
-      default: false
-      description: If true, skips release please.
-  workflow_call:
-    real-publish:
-      required: false
-      type: boolean
-      default: false
-      description: If true, will publish to prod pypi, otherwise it will publish to test. Defaults to false.
-    skip-release-please:
-      required: false
-      type: boolean
-      default: false
-      description: If true, skips release please.
+        required: false
+        type: boolean
+        default: false
+        description: If true, skips release please.
 name: release-please
 jobs:
   create-release:
