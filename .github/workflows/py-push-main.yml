@@ -28,11 +28,11 @@ jobs:
       #----------------------------------------------
       # release-please, increments version and tags releases.
       #----------------------------------------------
-      - uses: google-github-actions/release-please-action@v3
+      - uses: googleapis/release-please-action@v5
         id: release
         with:
           release-type: python
-          package-name: ${{ env.PY_PKG }}
+#          package-name: ${{ env.PY_PKG }}
 
   create-release-output:
     needs: create-release
