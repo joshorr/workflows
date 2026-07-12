@@ -24,10 +24,11 @@ runs:
     #----------------------------------------------
     - name: Install uv
       if: env.PKG_MANAGER == 'uv'
-      uses: astral-sh/setup-uv@v7
+      uses: astral-sh/setup-uv@v8.3.2
     - name: Install UV Dependencies
       if: env.PKG_MANAGER == 'uv'
       shell: bash
+      # This will install the correct version of python for us automatically.
       run: uv sync
 
     #----------------------------------------------
@@ -43,13 +44,13 @@ runs:
       run: |
         PY_VER=$(sed -n 's/^ *python *= *"[~^]*\([0-9\.]*\)"/\1/p' pyproject.toml)
         echo "PY_VERSION=$PY_VER" >> $GITHUB_ENV
-    - name: Setup Python v${{ env.PY_VERSION }}
+    - name: Setup Poetry's Python v${{ env.PY_VERSION }}
+      if: env.PKG_MANAGER == 'poetry'
       id: setup-python
       uses: actions/setup-python@v4
       with:
         python-version: ${{ env.PY_VERSION }}
         cache: poetry
-
     - name: Install Dependencies
       if: env.PKG_MANAGER == 'poetry'
       shell: bash
