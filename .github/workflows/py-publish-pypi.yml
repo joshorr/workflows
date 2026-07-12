@@ -17,27 +17,28 @@ jobs:
       #              build release
       #----------------------------------------------
       - name: Build
-        run: poetry build
-#      #----------------------------------------------
-#      #              publish release to pypi test
-#      #----------------------------------------------
-#      - name: Publish to test pypi
-#        if: ${{ !inputs.real-publish }}
-#        run: |
-#          poetry config repositories.test-pypi https://test.pypi.org/legacy/
-#          poetry config pypi-token.test-pypi ${{secrets.PYPI_TEST_TOKEN}}
-#          poetry publish -r test-pypi
+        run: ${{ case(env.PKG_MANAGER == 'uv', 'uv', 'poetry') }} build
+      #----------------------------------------------
+      #              publish release to pypi test
+      #----------------------------------------------
+      # TODO: Build a step to publish to test-pypi for uv.
+      - name: Publish to test pypi
+        if: ${{ env.PKG_MANAGER == 'poetry' && !inputs.real-publish }}
+        run: |
+          poetry config repositories.test-pypi https://test.pypi.org/legacy/
+          poetry config pypi-token.test-pypi ${{secrets.PYPI_TEST_TOKEN}}
+          poetry publish -r test-pypi
       #----------------------------------------------
       #              publish release tp pypi prod
       #----------------------------------------------
       - name: Publish to prod pypi
-        if: env.PKG_MANAGER == 'poetry'
+        if: env.PKG_MANAGER == 'poetry' && inputs.real-publish
         run: |
           poetry config pypi-token.pypi ${{secrets.PYPI_PROD_TOKEN}}
           poetry publish
 
       - name: Publish to prod pypi
-        if: env.PKG_MANAGER == 'uv'
+        if: env.PKG_MANAGER == 'uv' && inputs.real-publish
         run: |
           uv publish --token ${{secrets.PYPI_PROD_TOKEN}}
 
