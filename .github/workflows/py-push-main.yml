@@ -6,9 +6,26 @@ on:
         type: boolean
         default: false
         description: If true, will publish to prod pypi, otherwise it will publish to test. Defaults to false.
+      skip-release-please:
+      required: false
+      type: boolean
+      default: false
+      description: If true, skips release please.
+  workflow_call:
+    real-publish:
+      required: false
+      type: boolean
+      default: false
+      description: If true, will publish to prod pypi, otherwise it will publish to test. Defaults to false.
+    skip-release-please:
+      required: false
+      type: boolean
+      default: false
+      description: If true, skips release please.
 name: release-please
 jobs:
   create-release:
+    if: ${{ !inputs.skip-release-please }}
     runs-on: ubuntu-latest
     outputs:
       created-release: ${{ steps.release.outputs.release_created }}
@@ -43,13 +60,13 @@ jobs:
 
   publish-docs:
     needs: create-release
-    if: ${{ needs.create-release.outputs.created-release }}
+    if: ${{ needs.create-release.outputs.created-release || inputs.skip-release-please }}
     uses: joshorr/workflows/.github/workflows/py-publish-docs.yml@main
     secrets: inherit
 
   publish-release:
     needs: [create-release, publish-docs]
-    if: ${{ needs.create-release.outputs.created-release }}
+    if: ${{ needs.create-release.outputs.created-release || inputs.skip-release-please }}
     uses: joshorr/workflows/.github/workflows/py-publish-pypi.yml@main
     with:
       real-publish: ${{ inputs.real-publish }}
