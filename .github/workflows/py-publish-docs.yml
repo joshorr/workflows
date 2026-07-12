@@ -20,8 +20,9 @@ jobs:
       - name: Ensure on latest branch
         run: |
           git config pull.rebase true
-          git pull origin main
           git fetch --all
+          git pull --rebase --autostash origin main
+
 
       #----------------------------------------------
       #              Use poetry for Info
