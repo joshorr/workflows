@@ -49,13 +49,13 @@ jobs:
 
   publish-docs:
     needs: create-release
-    if: ${{ needs.create-release.outputs.created-release || inputs.skip-release-please }}
+    if: ${{ !cancelled() && ( needs.create-release.outputs.created-release || inputs.skip-release-please ) }}
     uses: joshorr/workflows/.github/workflows/py-publish-docs.yml@main
     secrets: inherit
 
   publish-release:
     needs: [create-release, publish-docs]
-    if: ${{ needs.create-release.outputs.created-release || inputs.skip-release-please }}
+    if: ${{ !cancelled() && (needs.create-release.outputs.created-release || inputs.skip-release-please) }}
     uses: joshorr/workflows/.github/workflows/py-publish-pypi.yml@main
     with:
       real-publish: ${{ inputs.real-publish }}
