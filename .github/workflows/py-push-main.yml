@@ -16,8 +16,14 @@ jobs:
       - name: Setup and Test Project
         uses: joshorr/workflows/py-run-tests@main
       - name: Retrieve Project Package
+        if: env.PKG_MANAGER == 'poetry'
         run: |
           PY_OUTPUT=$(poetry run python -c "import tomlkit; import pathlib; print(tomlkit.parse(pathlib.Path('pyproject.toml').read_text())['tool']['poetry']['name'], end='')")
+          echo "PY_PKG=$PY_OUTPUT" >> $GITHUB_ENV
+      - name: Retrieve Project Package
+        if: env.PKG_MANAGER == 'uv'
+        run: |
+          PY_OUTPUT=$(poetry run python -c "import tomlkit; import pathlib; print(tomlkit.parse(pathlib.Path('pyproject.toml').read_text())['project']['name'], end='')")
           echo "PY_PKG=$PY_OUTPUT" >> $GITHUB_ENV
       #----------------------------------------------
       # release-please, increments version and tags releases.

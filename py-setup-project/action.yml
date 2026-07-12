@@ -20,7 +20,7 @@ runs:
           echo "PKG_MANAGER=poetry" >> "$GITHUB_ENV"
         fi
     #----------------------------------------------
-    #         Poetry Based Project
+    #         uv Based Project
     #----------------------------------------------
     - name: Install uv
       if: env.PKG_MANAGER == 'uv'
@@ -32,7 +32,7 @@ runs:
       run: uv sync
 
     #----------------------------------------------
-    #         Poetry Based Project
+    #         poetry Based Project
     #----------------------------------------------
     - name: Install poetry
       if: env.PKG_MANAGER == 'poetry'
